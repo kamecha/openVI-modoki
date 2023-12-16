@@ -13,8 +13,26 @@ function InitializeOpenAI(apiKey: string): OpenAI {
   });
 }
 
+function GetAPIKey(): string {
+  let apiKey = "";
+  // from env
+  apiKey = Deno.env.get("OPENAI_API_KEY") ?? "";
+  // from file ~/.config/openai.token
+  if (apiKey === "") {
+    logger().info("env OPENAI_API_KEY is not set");
+    try {
+      apiKey = Deno.readTextFileSync(
+        Deno.env.get("HOME") + "/.config/openai.token",
+      );
+    } catch (error) {
+      logger().info(error);
+    }
+  }
+  return apiKey;
+}
+
 async function main() {
-  const openai = InitializeOpenAI(Deno.env.get("OPENAI_API_KEY") || "");
+  const openai = InitializeOpenAI(GetAPIKey());
   const stream = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: "Hello, World!" }],
@@ -30,8 +48,8 @@ async function main() {
 
 main();
 
-Deno.test("Check API key", { permissions: { env: true } }, () => {
-  assertNotEquals(Deno.env.get("OPENAI_API_KEY"), undefined);
+Deno.test("Check API key", { permissions: { env: true, read: true} }, () => {
+  assertNotEquals(GetAPIKey(), "");
 });
 
 Deno.bench("Initialize OpenAI", { permissions: { env: true } }, () => {
