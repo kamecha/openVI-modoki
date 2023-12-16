@@ -1,7 +1,13 @@
 import OpenAI from "https://deno.land/x/openai@v4.20.1/mod.ts";
 import { assertNotEquals } from "https://deno.land/std@0.209.0/assert/mod.ts";
+import { getLogger } from "https://deno.land/std@0.209.0/log/mod.ts";
+
+function logger() {
+  return getLogger("my-awesome-module");
+}
 
 function InitializeOpenAI(apiKey: string): OpenAI {
+  logger().debug("Initialize OpenAI");
   return new OpenAI({
     apiKey: apiKey,
   });
