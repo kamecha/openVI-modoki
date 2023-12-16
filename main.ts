@@ -1,4 +1,5 @@
 import OpenAI from "https://deno.land/x/openai@v4.20.1/mod.ts";
+import { assertNotEquals } from "https://deno.land/std@0.209.0/assert/mod.ts";
 
 function InitializeOpenAI(apiKey: string): OpenAI {
   return new OpenAI({
@@ -22,3 +23,13 @@ async function main() {
 }
 
 main();
+
+Deno.test("Check API key", { permissions: { env: true } }, () => {
+  assertNotEquals(Deno.env.get("OPENAI_API_KEY"), undefined);
+});
+
+Deno.bench("Initialize OpenAI", { permissions: { env: true } }, () => {
+  new OpenAI({
+    apiKey: Deno.env.get("OPENAI_API_KEY") || "",
+  });
+});
