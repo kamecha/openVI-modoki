@@ -58,9 +58,3 @@ main();
 Deno.test("Check API key", { permissions: { env: true, read: true} }, () => {
   assertNotEquals(GetAPIKey(), "");
 });
-
-Deno.bench("Initialize OpenAI", { permissions: { env: true } }, () => {
-  new OpenAI({
-    apiKey: Deno.env.get("OPENAI_API_KEY") || "",
-  });
-});
