@@ -1,6 +1,8 @@
 import OpenAI from "https://deno.land/x/openai@v4.20.1/mod.ts";
 import { assertNotEquals } from "https://deno.land/std@0.209.0/assert/mod.ts";
 import { getLogger } from "https://deno.land/std@0.209.0/log/mod.ts";
+import { Stream } from "https://deno.land/x/openai@v4.20.1/streaming.ts";
+import { ChatCompletionChunk } from "https://deno.land/x/openai@v4.20.1/resources/chat/mod.ts";
 
 function logger() {
   return getLogger("my-awesome-module");
@@ -31,13 +33,18 @@ function GetAPIKey(): string {
   return apiKey;
 }
 
-async function main() {
-  const openai = InitializeOpenAI(GetAPIKey());
-  const stream = await openai.chat.completions.create({
+async function ChatCompletion(openai: OpenAI, prompt: string): Promise<Stream<ChatCompletionChunk>> {
+  const result = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
-    messages: [{ role: "user", content: "Hello, World!" }],
+    messages: [{ role: "user", content: prompt }],
     stream: true,
   });
+  return result;
+}
+
+async function main() {
+  const openai = InitializeOpenAI(GetAPIKey());
+  const stream = await ChatCompletion(openai, "");
 
   for await (const chunk of stream) {
     Deno.stdout.write(
