@@ -61,10 +61,7 @@ async function ChatCompletion(
   return result;
 }
 
-export async function main(denops: Denops) {
-  const openai = InitializeOpenAI(GetAPIKey());
-  const stream = await ChatCompletion(openai, "");
-
+async function DrawStream(denops: Denops, stream: Stream<ChatCompletionChunk>) {
   let context = "";
   let i = 1;
   for await (const chunk of stream) {
@@ -76,6 +73,12 @@ export async function main(denops: Denops) {
       i += 1;
     }
   }
+}
+
+export async function main(denops: Denops) {
+  const openai = InitializeOpenAI(GetAPIKey());
+  const stream = await ChatCompletion( openai, "");
+  await DrawStream(denops, stream);
 }
 
 Deno.test("Check API key", { permissions: { env: true, read: true } }, () => {
