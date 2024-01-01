@@ -49,7 +49,10 @@ function GetAPIKey(): string {
   return apiKey;
 }
 
-async function ChatCompletion(openai: OpenAI, prompt: string): Promise<Stream<ChatCompletionChunk>> {
+async function ChatCompletion(
+  openai: OpenAI,
+  prompt: string,
+): Promise<Stream<ChatCompletionChunk>> {
   const result = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: prompt }],
