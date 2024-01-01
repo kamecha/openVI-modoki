@@ -61,14 +61,18 @@ async function ChatCompletion(
   return result;
 }
 
-async function DrawStream(denops: Denops, stream: Stream<ChatCompletionChunk>) {
+async function DrawStream(
+  denops: Denops,
+  buf: fn.BufNameArg,
+  stream: Stream<ChatCompletionChunk>,
+) {
   let context = "";
   let i = 1;
   for await (const chunk of stream) {
     logger().debug(chunk.choices);
     context += chunk.choices[0].delta.content || "";
     if (context.includes("\n")) {
-      await fn.setline(denops, i, context.trimEnd());
+      await fn.setbufline(denops, buf, i, context.trimEnd());
       context = "";
       i += 1;
     }
@@ -77,8 +81,9 @@ async function DrawStream(denops: Denops, stream: Stream<ChatCompletionChunk>) {
 
 export async function main(denops: Denops) {
   const openai = InitializeOpenAI(GetAPIKey());
-  const stream = await ChatCompletion( openai, "");
-  await DrawStream(denops, stream);
+  const stream = await ChatCompletion(openai, "");
+  const buf = await fn.bufnr(denops);
+  await DrawStream(denops, buf, stream);
 }
 
 Deno.test("Check API key", { permissions: { env: true, read: true } }, () => {
