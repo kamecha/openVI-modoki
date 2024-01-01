@@ -1,13 +1,27 @@
 import OpenAI from "https://deno.land/x/openai@v4.20.1/mod.ts";
 import { assertNotEquals } from "https://deno.land/std@0.209.0/assert/mod.ts";
-import { getLogger } from "https://deno.land/std@0.209.0/log/mod.ts";
+import * as log from "https://deno.land/std@0.209.0/log/mod.ts";
 import { Stream } from "https://deno.land/x/openai@v4.20.1/streaming.ts";
 import { ChatCompletionChunk } from "https://deno.land/x/openai@v4.20.1/resources/chat/mod.ts";
 import { Denops } from "https://deno.land/x/denops_std@v5.2.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.2.0/function/mod.ts";
 
 function logger() {
-  return getLogger("my-awesome-module");
+  log.setup({
+    handlers: {
+      file: new log.handlers.FileHandler("DEBUG", {
+        filename: "./log.txt",
+        formatter: "{levelName} {msg}",
+      }),
+    },
+    loggers: {
+      default: {
+        level: "DEBUG",
+        handlers: ["file"],
+      },
+    },
+  });
+  return log.getLogger();
 }
 
 function InitializeOpenAI(apiKey: string): OpenAI {
@@ -51,6 +65,7 @@ export async function main(denops: Denops) {
   let context = "";
   let i = 1;
   for await (const chunk of stream) {
+    logger().debug(chunk.choices);
     context += chunk.choices[0].delta.content || "";
     if (context.includes("\n")) {
       await fn.setline(denops, i, context.trimEnd());
