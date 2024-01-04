@@ -3,6 +3,7 @@ import { ChatCompletionChunk, OpenAI, Stream } from "./deps/openai.ts";
 import { Denops, fn } from "./deps/denops.ts";
 import { logger } from "./logger.ts";
 import { GetAPIKey, InitializeOpenAI } from "./openai.ts";
+import { OpenPrompt } from "./prompt.ts";
 
 async function ChatCompletion(
   openai: OpenAI,
@@ -32,20 +33,6 @@ async function DrawStream(
       i += 1;
     }
   }
-}
-
-async function OpenPrompt(denops: Denops): Promise<fn.BufNameArg> {
-  // make prompt buffer
-  const promptName = "vi-prompt";
-  const promptBuffer = await fn.bufnr(denops, promptName, true);
-  await fn.setbufvar(denops, promptBuffer, "&filetype", "vi-prompt");
-  // open prompt buffer
-  const currentBuffer = await fn.bufnr(denops);
-  await fn.setbufvar(denops, currentBuffer, "&splitbelow", 1);
-  await denops.cmd(`sbuffer ${promptBuffer}`);
-  await denops.cmd("setlocal buftype=nofile");
-  await fn.setbufvar(denops, currentBuffer, "&splitbelow", 0);
-  return promptBuffer;
 }
 
 async function OpenChat(denops: Denops): Promise<fn.BufNameArg> {
