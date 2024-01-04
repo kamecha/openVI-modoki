@@ -2,31 +2,7 @@ import { assertNotEquals } from "./deps/std/assert.ts";
 import { ChatCompletionChunk, OpenAI, Stream } from "./deps/openai.ts";
 import { Denops, fn } from "./deps/denops.ts";
 import { logger } from "./logger.ts";
-
-function InitializeOpenAI(apiKey: string): OpenAI {
-  logger().debug("Initialize OpenAI");
-  return new OpenAI({
-    apiKey: apiKey,
-  });
-}
-
-function GetAPIKey(): string {
-  let apiKey = "";
-  // from env
-  apiKey = Deno.env.get("OPENAI_API_KEY") ?? "";
-  // from file ~/.config/openai.token
-  if (apiKey === "") {
-    logger().info("env OPENAI_API_KEY is not set");
-    try {
-      apiKey = Deno.readTextFileSync(
-        Deno.env.get("HOME") + "/.config/openai.token",
-      );
-    } catch (error) {
-      logger().info(error);
-    }
-  }
-  return apiKey;
-}
+import { GetAPIKey, InitializeOpenAI } from "./openai.ts";
 
 async function ChatCompletion(
   openai: OpenAI,
