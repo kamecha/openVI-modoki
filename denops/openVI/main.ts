@@ -1,25 +1,7 @@
 import { assertNotEquals } from "./deps/std/assert.ts";
-import { log } from "./deps/std/log.ts";
 import { ChatCompletionChunk, OpenAI, Stream } from "./deps/openai.ts";
 import { Denops, fn } from "./deps/denops.ts";
-
-function logger() {
-  log.setup({
-    handlers: {
-      file: new log.handlers.FileHandler("DEBUG", {
-        filename: "./log.txt",
-        formatter: "{levelName} {msg}",
-      }),
-    },
-    loggers: {
-      default: {
-        level: "DEBUG",
-        handlers: ["file"],
-      },
-    },
-  });
-  return log.getLogger();
-}
+import { logger } from "./logger.ts";
 
 function InitializeOpenAI(apiKey: string): OpenAI {
   logger().debug("Initialize OpenAI");
