@@ -79,11 +79,57 @@ async function DrawStream(
   }
 }
 
-export async function main(denops: Denops) {
+async function OpenPrompt(denops: Denops): Promise<fn.BufNameArg> {
+  // make prompt buffer
+  const promptName = "vi-prompt";
+  const promptBuffer = await fn.bufnr(denops, promptName, true);
+  await fn.setbufvar(denops, promptBuffer, "&filetype", "vi-prompt");
+  // open prompt buffer
+  const currentBuffer = await fn.bufnr(denops);
+  await fn.setbufvar(denops, currentBuffer, "&splitbelow", 1);
+  await denops.cmd(`sbuffer ${promptBuffer}`);
+  await denops.cmd("setlocal buftype=nofile");
+  await fn.setbufvar(denops, currentBuffer, "&splitbelow", 0);
+  return promptBuffer;
+}
+
+async function OpenChat(denops: Denops): Promise<fn.BufNameArg> {
+  // make chat buffer
+  const chatName = "vi-chat";
+  const chatBuffer = await fn.bufnr(denops, chatName, true);
+  await fn.setbufvar(denops, chatBuffer, "&filetype", "vi-chat");
+  await fn.setbufvar(denops, chatBuffer, "&buftype", "nofile");
+  await fn.setbufvar(denops, chatBuffer, "&number", 0);
+  // open chat buffer
+  await denops.cmd(`sbuffer ${chatBuffer}`);
+  return chatBuffer;
+}
+
+async function ChatStream(
+  denops: Denops,
+  openai: OpenAI,
+  chatBuffer: fn.BufNameArg,
+  prompt: string,
+) {
+  const stream = await ChatCompletion(openai, prompt);
+  await DrawStream(denops, chatBuffer, stream);
+  console.log("done");
+}
+
+export function main(denops: Denops) {
   const openai = InitializeOpenAI(GetAPIKey());
-  const stream = await ChatCompletion(openai, "");
-  const buf = await fn.bufnr(denops);
-  await DrawStream(denops, buf, stream);
+  denops.dispatcher = {
+    async openPrompt(): Promise<unknown> {
+      await OpenPrompt(denops);
+      return Promise.resolve();
+    },
+    async sendPrompt(prompt: unknown): Promise<unknown> {
+      const content = (prompt as string[]).join("\n");
+      const chatBuffer = await OpenChat(denops);
+      await ChatStream(denops, openai, chatBuffer, content);
+      return Promise.resolve();
+    },
+  };
 }
 
 Deno.test("Check API key", { permissions: { env: true, read: true } }, () => {
