@@ -1,10 +1,7 @@
-import OpenAI from "https://deno.land/x/openai@v4.20.1/mod.ts";
-import { assertNotEquals } from "https://deno.land/std@0.209.0/assert/mod.ts";
-import * as log from "https://deno.land/std@0.209.0/log/mod.ts";
-import { Stream } from "https://deno.land/x/openai@v4.20.1/streaming.ts";
-import { ChatCompletionChunk } from "https://deno.land/x/openai@v4.20.1/resources/chat/mod.ts";
-import { Denops } from "https://deno.land/x/denops_std@v5.2.0/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.2.0/function/mod.ts";
+import { assertNotEquals } from "./deps/std/assert.ts";
+import { log } from "./deps/std/log.ts";
+import { ChatCompletionChunk, OpenAI, Stream } from "./deps/openai.ts";
+import { Denops, fn } from "./deps/denops.ts";
 
 function logger() {
   log.setup({
