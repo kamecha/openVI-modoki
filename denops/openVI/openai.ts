@@ -1,4 +1,5 @@
 import { OpenAI } from "./deps/openai.ts";
+import { assertNotEquals } from "./deps/std/assert.ts";
 import { logger } from "./logger.ts";
 
 export function GetAPIKey(): string {
@@ -25,3 +26,7 @@ export function InitializeOpenAI(apiKey: string): OpenAI {
     apiKey: apiKey,
   });
 }
+
+Deno.test("Check API key", { permissions: { env: true, read: true } }, () => {
+  assertNotEquals(GetAPIKey(), "");
+});

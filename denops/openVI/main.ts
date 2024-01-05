@@ -1,4 +1,3 @@
-import { assertNotEquals } from "./deps/std/assert.ts";
 import { Denops } from "./deps/denops.ts";
 import { GetAPIKey, InitializeOpenAI } from "./openai.ts";
 import { OpenPrompt } from "./prompt.ts";
@@ -19,7 +18,3 @@ export function main(denops: Denops) {
     },
   };
 }
-
-Deno.test("Check API key", { permissions: { env: true, read: true } }, () => {
-  assertNotEquals(GetAPIKey(), "");
-});
