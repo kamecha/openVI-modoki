@@ -22,7 +22,6 @@ async function DrawStream(
   let context = "";
   let i = 1;
   for await (const chunk of stream) {
-    logger().debug(chunk.choices);
     context += chunk.choices[0].delta.content || "";
     if (context.includes("\n")) {
       await fn.setbufline(denops, buf, i, context.trimEnd());

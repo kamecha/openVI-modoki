@@ -8,20 +8,18 @@ export function GetAPIKey(): string {
   apiKey = Deno.env.get("OPENAI_API_KEY") ?? "";
   // from file ~/.config/openai.token
   if (apiKey === "") {
-    logger().info("env OPENAI_API_KEY is not set");
     try {
       apiKey = Deno.readTextFileSync(
         Deno.env.get("HOME") + "/.config/openai.token",
       );
     } catch (error) {
-      logger().info(error);
+      console.error(error);
     }
   }
   return apiKey;
 }
 
 export function InitializeOpenAI(apiKey: string): OpenAI {
-  logger().debug("Initialize OpenAI");
   return new OpenAI({
     apiKey: apiKey,
   });
