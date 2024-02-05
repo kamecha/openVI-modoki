@@ -20,13 +20,13 @@ async function DrawStream(
   stream: Stream<ChatCompletionChunk>,
 ) {
   let context = "";
-  let i = 1;
+  let lnum = 1;
   for await (const chunk of stream) {
     context += chunk.choices[0].delta.content || "";
-    await fn.setbufline(denops, buf, i, context.trimEnd());
+    await fn.setbufline(denops, buf, lnum, context.trimEnd());
     if (chunk.choices[0].delta.content?.endsWith("\n")) {
       context = "";
-      i += 1;
+      lnum += 1;
     }
   }
 }
