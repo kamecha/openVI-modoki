@@ -1,5 +1,6 @@
 import { OpenAI } from "./deps/openai.ts";
 import { assertNotEquals } from "./deps/std/assert.ts";
+import { join } from "./deps/std/path.ts";
 import { logger } from "./logger.ts";
 
 export function GetAPIKey(): string {
@@ -9,9 +10,8 @@ export function GetAPIKey(): string {
   // from file ~/.config/openai.token
   if (apiKey === "") {
     try {
-      apiKey = Deno.readTextFileSync(
-        Deno.env.get("HOME") + "/.config/openai.token",
-      );
+      const path = join(Deno.env.get("HOME") ?? "~", ".config", "openai.token");
+      apiKey = Deno.readTextFileSync(path);
     } catch (error) {
       console.error(error);
     }
